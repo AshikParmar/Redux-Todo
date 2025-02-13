@@ -7,7 +7,7 @@ function App() {
 
   return (
     <>
-      <h2 className='font-extrabold text-3xl underline'>Manage Your Todos</h2>
+      <h2 className='font-extrabold text-3xl underline text-white'>Manage Your Todos</h2>
       <AddTodo/>
       <Todo/>
     </>

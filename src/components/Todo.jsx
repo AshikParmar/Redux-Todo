@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { removeTodo,updateTodo } from '../redux/slices/todoSlice'
+import { removeTodo,updateTodo, toggleTodo } from '../redux/slices/todoSlice'
 
 function Todos() {
     const todos = useSelector(state => state.todos)
@@ -13,7 +13,7 @@ function Todos() {
 
     function handleUpdate(id,text){
       if(editId === id){
-        dispatch(updateTodo({ id: id, newText: editText }));
+        dispatch(updateTodo({ id, newText: editText }));
         setEditId(null);
       }
       else{
@@ -23,6 +23,10 @@ function Todos() {
         setTimeout(()=> inputRef.current?.focus(),0);
       }
       
+    } 
+
+    const toggleCompleted = (id) => {
+      dispatch(toggleTodo(id));
     }
 
   return (
@@ -30,26 +34,45 @@ function Todos() {
     <ul className="list-none">
         {todos.map((todo) => todo.text ? (
           <li
-            className="mt-4 flex justify-between items-center space-x-2 bg-zinc-800 px-4 py-2 rounded"
+            className={`mt-4 flex justify-between items-center border border-black/10 space-x-2 px-4 py-2 rounded shadow-sm shadow-white/50 duration-300  text-black ${todo.complete ? "bg-[#c6e9a7]" : "bg-[#ccbed7]"}`}
             key={todo.id}
           >
-            {editId === todo.id ? (
-              <input
-                className='text-white w-full '
-                ref={inputRef}
-                type="text"
-                value={editText}
-                onChange={(e) => setEditText(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleUpdate(editId, editText)} 
-              /> ):
-              <div className='text-white'>{todo.text}</div>
-            }
+            <div className='flex gap-2'>
+              <input 
+                type="checkbox"
+                className='cursor-pointer'
+                checked={todo.complete}
+                onChange={() => toggleCompleted(todo.id)}
+                />
+              {editId === todo.id ? (
+                <input
+                  className='border outline-none w-full border-black/10 px-2'
+                  ref={inputRef}
+                  type="text"
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleUpdate(editId, editText)} 
+                /> ):
+                <div className={`border outline-none w-full bg-transparent border-transparent ${todo.complete ? "line-through text-gray-500" : ""}`}>{todo.text}</div>
+              }
+
+                {/* <input
+                  className={`border outline-none w-full bg-transparent rounded-lg ${editId===todo.id ? "border-black/10 px-2" : "border-transparent"} ${todo.complete ? "line-through" : ""}`}
+                  ref={inputRef}
+                  type="text"
+                  value={editId===todo.id ? editText : todo.text}
+                  onChange={(e) => setEditText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleUpdate(editId, editText)} 
+                  readOnly={!(editId===todo.id)}
+                />  */}
+            </div>
 
             <div className="flex space-x-2">
               {/* Update Button */}
               <button
                 onClick={() => handleUpdate(todo.id,todo.text)}
-                className="text-white bg-blue-500 border-0 py-1 md:px-4 px-1 focus:outline-none hover:bg-blue-600 rounded text-md"
+                disabled={todo.complete}
+                className="text-white bg-blue-500 border-0 py-1 md:px-4 px-1 focus:outline-none hover:bg-blue-600 rounded text-md disabled:opacity-50"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
